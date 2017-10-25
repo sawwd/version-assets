@@ -31,12 +31,15 @@ function get_local_path($src)
         return false;
     }
 
-    $web_root  = apply_filters('version_assets/web_root', dirname(WP_CONTENT_DIR));
+    $web_root = apply_filters('version_assets/web_root', dirname(WP_CONTENT_DIR));
+
+    if (strpos($src, 'wp-includes') || strpos($src, 'wp-admin')) {
+        $web_root = str_replace( '/app', '/wp', $web_root );
+    }
+
     $file_path = path_join($web_root, ltrim(parse_url($src, PHP_URL_PATH), '/\\'));
 
-    if (strpos($file_path, 'wp-includes') || strpos($file_path, 'wp-admin')) {
-       $file_path = str_replace('web/', 'web/wp/', $file_path);
-    }
+    if (!is_file(realpath($file_path))) return false;
 
     if (realpath($file_path)) {
         return $file_path;
